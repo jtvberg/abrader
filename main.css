@@ -37,7 +37,7 @@ body {
   overflow: hidden;
   font-family: Fredoka;
   font-weight: 400;
-  user-select: none;
+  /* user-select: none; */
   background-color: transparent;
   -webkit-font-smoothing: antialiased;
 }

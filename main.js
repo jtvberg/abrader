@@ -12,9 +12,9 @@ let win = null
 const createWindow = () => {
   // Create main window
   win = new BrowserWindow({
-    width: 1220,
+    width: 800,
     height: 600,
-    minWidth: 1220,
+    minWidth: 800,
     minHeight: 600,
     transparent: isMac,
     hasShadow: false,
