@@ -57,13 +57,13 @@ const createWindow = () => {
 
   win.setVibrancy('light')
 
-  // nativeTheme.on('updated', () => {
-  //   if (nativeTheme.shouldUseDarkColors) {
-  //     win.setVibrancy('dark')
-  //   } else {
-  //     win.setVibrancy('light')
-  //   }
-  // })
+  nativeTheme.on('updated', () => {
+    if (nativeTheme.shouldUseDarkColors) {
+      win.setVibrancy('dark')
+    } else {
+      win.setVibrancy('light')
+    }
+  })
 }
 
 // Load electron-reload in dev
