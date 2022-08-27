@@ -1,8 +1,10 @@
 const $ = require('jquery')
 const { exec } = require('child_process')
+let docList = []
 
-$('#drop-file').on('dragover', false).on('drop', function(e) {
+$('body').on('dragover', false).on('drop', function(e) {
   e.preventDefault()
+  $('.parsed-text').children().empty()
   if (e.originalEvent.dataTransfer.items) {
     [...e.originalEvent.dataTransfer.items].forEach((item, i) => {
       if (item.kind === 'file') {
@@ -18,7 +20,13 @@ $('#drop-file').on('dragover', false).on('drop', function(e) {
               return
           }
           $('.parsed-text').append(`<div>${stdout}</div>`)
-          countWords()
+          docList.push(
+            {
+              doc: file.name,
+              wordCount: countWords($('.parsed-text').text()),
+              rawText: stdout
+            }
+          )
         })
       }
     })
@@ -29,13 +37,34 @@ $('#drop-file').on('dragover', false).on('drop', function(e) {
   }
 })
 
-const countWords = () => {
-  let words = ['CI/CD', 'Jenkins', 'API', 'Container', 'Kuber', 'Docker', 'React', 'AWS ', 'GCP', 'Azure', 'DevOps']
+const countWords = (text) => {
+  let words = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kuber', 'Docker', 'React', 'AWS ', 'GCP', 'Azure', 'DevOps', 'CDN']
+  let wordCount = []
   $.each(words, (i, word) => {
-    $('#drop-file').append(`<div class="drop-item">${word}: ${countWord($('.parsed-text').text().toLowerCase(), word.toLowerCase())}</div>`)
+    wordCount.push(
+      {
+        word: word.trim(), 
+        count: countWord(text.toLowerCase(), word.toLowerCase())
+      }
+    )
   })
+  return wordCount
 }
 
 const countWord = (text, word) => {
   return text.split(word).length - 1
 }
+
+const displayStats = (entry) => {
+  console.log(docList)
+  $('.doc-stats, .parsed-text').children().empty()
+  $('.doc-stats').append(`<div class="stat-item">${entry.doc}</div>`)
+  $.each(entry.wordCount, (i, word) => {
+    $('.doc-stats').append(`<div class="stat-item">${word.word}: ${word.count}</div>`)
+  })
+  $('.parsed-text').append(`<div>${entry.rawText}</div>`)
+}
+
+$(document).on('click', '.drop-item', function () {
+  displayStats(docList.find(i => i.doc === $(this).text()))
+})
