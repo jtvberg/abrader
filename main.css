@@ -37,7 +37,7 @@ body {
   overflow: hidden;
   font-family: Fredoka;
   font-weight: 400;
-  user-select: none;
+  /* user-select: none; */
   margin: 0;
   background-color: transparent;
   -webkit-font-smoothing: antialiased;
@@ -58,6 +58,7 @@ body {
   grid-row: 2;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  height: calc(100vh - 30px);
 }
 
 .drop-area {
@@ -68,4 +69,10 @@ body {
 .parsed-text {
   grid-column: 2;
   background-color: var(--color-white);
+  overflow-y: auto;
+}
+
+.drop-item {
+  margin: 3px;
+  color: var(--color-fg);
 }
