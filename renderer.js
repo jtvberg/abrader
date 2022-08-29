@@ -1,16 +1,15 @@
 const $ = require('jquery')
 const { exec } = require('child_process')
 let docList = []
+let wordList = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kubernetes', 'Docker', 'React', 'AWS ', 'GCP', 'Azure', 'DevOps', 'CDN']
 
 $('body').on('dragover', false).on('drop', function(e) {
   e.preventDefault()
-  $('.parsed-text').children().empty()
   if (e.originalEvent.dataTransfer.items) {
     [...e.originalEvent.dataTransfer.items].forEach((item, i) => {
       if (item.kind === 'file') {
         const file = item.getAsFile()
-        $('#drop-file').append(`<div class="drop-item">${file.name}</div>`)
-        exec(`unzip -p ${file.path} word/document.xml`, (error, stdout, stderr) => {
+        exec(`unzip -p "${file.path}" word/document.xml`, (error, stdout, stderr) => {
           if (error) {
             console.log(`error: ${error.message}`)
             return
@@ -19,28 +18,27 @@ $('body').on('dragover', false).on('drop', function(e) {
               console.log(`stderr: ${stderr}`)
               return
           }
+          if (docList.some(i => i.doc === file.name)) { return }
+          $('#drop-file').append(`<div class="drop-item">${file.name}</div>`)
+          $('.parsed-text').empty()
           $('.parsed-text').append(`<div>${stdout}</div>`)
+          $('.parsed-text').html(`<div>${$('.parsed-text').text()}</div>`)
           docList.push(
             {
               doc: file.name,
               wordCount: countWords($('.parsed-text').text()),
-              rawText: stdout
+              rawText: $('.parsed-text').text()
             }
           )
         })
       }
     })
-  } else {
-    [...e.originalEvent.dataTransfer.files].forEach((file, i) => {
-      console.log(`… file[${i}].name = ${file.name}`)
-    })
   }
 })
 
 const countWords = (text) => {
-  let words = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kuber', 'Docker', 'React', 'AWS ', 'GCP', 'Azure', 'DevOps', 'CDN']
   let wordCount = []
-  $.each(words, (i, word) => {
+  $.each(wordList, (i, word) => {
     wordCount.push(
       {
         word: word.trim(), 
@@ -56,15 +54,24 @@ const countWord = (text, word) => {
 }
 
 const displayStats = (entry) => {
-  console.log(docList)
-  $('.doc-stats, .parsed-text').children().empty()
+  $('.doc-stats, .parsed-text').empty()
   $('.doc-stats').append(`<div class="stat-item">${entry.doc}</div>`)
   $.each(entry.wordCount, (i, word) => {
-    $('.doc-stats').append(`<div class="stat-item">${word.word}: ${word.count}</div>`)
+    $('.doc-stats').append(`<div class="stat-item" data-term="${word.word}">${word.word}: ${word.count}</div>`)
   })
-  $('.parsed-text').append(`<div>${entry.rawText}</div>`)
+  $('.parsed-text').html(`<div>${entry.rawText}</div>`)
+}
+
+const highlightTerm = (term) => {
+  let mark = `<mark>${term}</mark>`
+  let hl = $('.parsed-text').text().replace(new RegExp(term, 'gi'), mark)
+  $('.parsed-text').html(hl)
 }
 
 $(document).on('click', '.drop-item', function () {
   displayStats(docList.find(i => i.doc === $(this).text()))
+})
+
+$(document).on('click', '.stat-item', function () {
+  highlightTerm($(this).data('term'))
 })

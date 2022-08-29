@@ -58,12 +58,12 @@ body {
 .focus-container {
   grid-row: 2;
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 300px 1fr;
   grid-template-rows: 1fr 1fr;
   height: calc(100vh - 30px);
 }
 
-.drop-area {
+.doc-list {
   grid-column: 1;
   grid-row-start: 1;
   grid-row-end: 3;
@@ -71,6 +71,7 @@ body {
 }
 
 .parsed-text {
+  padding: 3px;
   grid-column: 2;
   grid-row: 2;
   overflow-y: auto;
@@ -84,8 +85,12 @@ body {
 .drop-item {
   margin: 3px;
   cursor: pointer;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
 }
 
 .stat-item {
-
+  margin: 3px;
+  cursor: pointer;
 }
