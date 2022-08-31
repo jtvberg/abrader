@@ -1,5 +1,7 @@
+const { ipcRenderer } = require('electron')
 const $ = require('jquery')
 const { exec } = require('child_process')
+
 let docList = []
 let wordList = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kubernetes', 'Docker', 'React', 'AWS ', 'GCP', 'Azure', 'DevOps', 'CDN']
 
@@ -9,6 +11,12 @@ $('body').on('dragover', false).on('drop', function(e) {
     [...e.originalEvent.dataTransfer.items].forEach((item, i) => {
       if (item.kind === 'file') {
         const file = item.getAsFile()
+        if (docList.some(i => i.doc === file.name)) { return }
+        $('#drop-file').append(`<div class="drop-item">${file.name}</div>`)
+        if (file.type === 'application/pdf') {
+          ipcRenderer.send('parse-pdf', { path: file.path, name: file.name })
+          return
+        }
         exec(`unzip -p "${file.path}" word/document.xml`, (error, stdout, stderr) => {
           if (error) {
             console.log(`error: ${error.message}`)
@@ -18,24 +26,39 @@ $('body').on('dragover', false).on('drop', function(e) {
               console.log(`stderr: ${stderr}`)
               return
           }
-          if (docList.some(i => i.doc === file.name)) { return }
-          $('#drop-file').append(`<div class="drop-item">${file.name}</div>`)
-          $('.parsed-text').empty()
-          $('.parsed-text').append(`<div>${stdout}</div>`)
-          $('.parsed-text').html(`<div>${$('.parsed-text').text()}</div>`)
-          docList.push(
-            {
-              doc: file.name,
-              wordCount: countWords($('.parsed-text').text()),
-              rawText: $('.parsed-text').text()
-            }
-          )
+          addDoc(file.name, stdout)
         })
       }
     })
   }
 })
 
+ipcRenderer.on('json-pdf', (e, data) => {
+  addDoc(data.name, data.text)
+})
+
+/**
+ *
+ * @param name File name
+ * @param text Raw text to store
+ */
+const addDoc = (name, text) => {
+  $('.parsed-text').empty()
+  $('.parsed-text').append(`<div>${text}</div>`)
+  $('.parsed-text').html(`<div>${$('.parsed-text').text()}</div>`)
+  docList.push(
+    {
+      doc: name,
+      wordCount: countWords($('.parsed-text').text()),
+      rawText: $('.parsed-text').text()
+    }
+  )
+}
+
+/**
+ *
+ * @param text Raw text to index
+ */
 const countWords = (text) => {
   let wordCount = []
   $.each(wordList, (i, word) => {
@@ -49,10 +72,19 @@ const countWords = (text) => {
   return wordCount
 }
 
+/**
+ *
+ * @param text Raw text to search
+ * @param word Word from search term list (wordList) to count
+ */
 const countWord = (text, word) => {
   return text.split(word).length - 1
 }
 
+/**
+ *
+ * @param entry Item from Document List (docList) to look up and display
+ */
 const displayStats = (entry) => {
   $('.doc-stats, .parsed-text').empty()
   $('.doc-stats').append(`<div class="stat-item">${entry.doc}</div>`)
@@ -62,6 +94,10 @@ const displayStats = (entry) => {
   $('.parsed-text').html(`<div>${entry.rawText}</div>`)
 }
 
+/**
+ *
+ * @param term String to highlight in the raw doc
+ */
 const highlightTerm = (term) => {
   let mark = `<mark>${term}</mark>`
   let hl = $('.parsed-text').text().replace(new RegExp(term, 'gi'), mark)

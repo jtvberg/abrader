@@ -1,11 +1,21 @@
 // Imports and variable declarations
-const { app, BrowserWindow, nativeTheme, systemPreferences } = require('electron')
+const { app, BrowserWindow, nativeTheme, systemPreferences, ipcMain } = require('electron')
 const path = require('path')
 const updater = require('./updater')
 const isDev = !app.isPackaged
 const isMac = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
 const isWindows = process.platform === 'win32'
+const PDFParser = require("pdf2json")
+const pdfParser = new PDFParser(this, 1)
+let parsedPdf = { name: '', text: ''}
+
+// PDF parsing
+pdfParser.on("pdfParser_dataError", errData => console.error(errData.parserError))
+pdfParser.on("pdfParser_dataReady", () => {
+    parsedPdf.text = pdfParser.getRawTextContent()
+    win.webContents.send('json-pdf', parsedPdf)
+})
 
 // Main window
 let win = null
@@ -95,4 +105,11 @@ app.on('activate', () => {
 // CLose app if all windows are closed (not Mac)
 app.on('window-all-closed', () => {
   app.quit()
+})
+
+// IPC channel passing pdf file path for parsing
+ipcMain.on('parse-pdf', (e, file) => {
+  parsedPdf.name = file.name
+  parsedPdf.text = ''
+  pdfParser.loadPDF(file.path)
 })
