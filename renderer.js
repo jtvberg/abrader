@@ -3,7 +3,7 @@ const $ = require('jquery')
 const { exec } = require('child_process')
 
 let docList = []
-let wordList = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kubernetes', 'Docker', 'React', 'AWS ', 'GCP', 'Azure', 'DevOps', 'CDN']
+let wordList = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kubernetes', 'Docker', 'React', 'AWS ', 'Amazon', 'GCP', 'Azure', 'DevOps', 'CDN']
 
 $('body').on('dragover', false).on('drop', function(e) {
   e.preventDefault()
@@ -33,14 +33,15 @@ $('body').on('dragover', false).on('drop', function(e) {
   }
 })
 
+// IPC channel for return of parsed pdf text
 ipcRenderer.on('json-pdf', (e, data) => {
   addDoc(data.name, data.text)
 })
 
 /**
- *
- * @param name File name
- * @param text Raw text to store
+ * Funtion that adds documents to document list
+ * @param {string} name File name
+ * @param {string} text Raw text to store
  */
 const addDoc = (name, text) => {
   $('.parsed-text').empty()
@@ -53,11 +54,13 @@ const addDoc = (name, text) => {
       rawText: $('.parsed-text').text()
     }
   )
+  displayStats(docList.find(i => i.doc === name))
 }
 
 /**
- *
- * @param text Raw text to index
+ * Function that iterates on search terms and stores results
+ * @param {string} text Raw text to index
+ * @return {number[]} Word counts
  */
 const countWords = (text) => {
   let wordCount = []
@@ -73,17 +76,18 @@ const countWords = (text) => {
 }
 
 /**
- *
- * @param text Raw text to search
- * @param word Word from search term list (wordList) to count
+ * Function that returns the count a specifed term
+ * @param {string} text Raw text to search
+ * @param {string} word Word from search term list (wordList) to count
+ * @return {number} Word count
  */
 const countWord = (text, word) => {
   return text.split(word).length - 1
 }
 
 /**
- *
- * @param entry Item from Document List (docList) to look up and display
+ * Function that displays the stats of a selected document
+ * @param {string} entry Item from Document List (docList) to look up and display
  */
 const displayStats = (entry) => {
   $('.doc-stats, .parsed-text').empty()
@@ -95,8 +99,8 @@ const displayStats = (entry) => {
 }
 
 /**
- *
- * @param term String to highlight in the raw doc
+ * Function that highlights a selected term in the raw text
+ * @param {string} term String to highlight in the raw doc
  */
 const highlightTerm = (term) => {
   let mark = `<mark>${term}</mark>`
@@ -104,10 +108,12 @@ const highlightTerm = (term) => {
   $('.parsed-text').html(hl)
 }
 
+// Display doc stats on doc list item click
 $(document).on('click', '.drop-item', function () {
   displayStats(docList.find(i => i.doc === $(this).text()))
 })
 
+// Highlight term in raw text on stat word click
 $(document).on('click', '.stat-item', function () {
   highlightTerm($(this).data('term'))
 })
