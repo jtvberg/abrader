@@ -60,7 +60,7 @@ const addDoc = (name, text) => {
 /**
  * Function that iterates on search terms and stores results
  * @param {string} text Raw text to index
- * @return {number[]} Word counts
+ * @return {object[]} Word counts
  */
 const countWords = (text) => {
   let wordCount = []
@@ -91,9 +91,10 @@ const countWord = (text, word) => {
  */
 const displayStats = (entry) => {
   $('.doc-stats, .parsed-text').empty()
-  $('.doc-stats').append(`<div class="stat-item">${entry.doc}</div>`)
+  $('.doc-stats').append(`<div class="doc-focus">${entry.doc}</div>`)
   $.each(entry.wordCount, (i, word) => {
-    $('.doc-stats').append(`<div class="stat-item" data-term="${word.word}">${word.word}: ${word.count}</div>`)
+    $('.doc-stats').append(`<div class="stat-item" data-term="${word.word}">${word.word}</div>`)
+    $('.doc-stats').append(`<div class="stat-bar" style="width: ${word.count * 10}px" data-term="${word.word}">${word.count}</div>`)
   })
   $('.parsed-text').html(`<div>${entry.rawText}</div>`)
 }
@@ -111,9 +112,13 @@ const highlightTerm = (term) => {
 // Display doc stats on doc list item click
 $(document).on('click', '.drop-item', function () {
   displayStats(docList.find(i => i.doc === $(this).text()))
+  $('.parsed-text').scrollTop(0)
 })
 
 // Highlight term in raw text on stat word click
-$(document).on('click', '.stat-item', function () {
+$(document).on('click', '.stat-item, .stat-bar', function () {
   highlightTerm($(this).data('term'))
+  if($('mark').get(0)) {
+    $('mark').get(0).scrollIntoView()
+  }
 })

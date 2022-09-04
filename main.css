@@ -1,14 +1,15 @@
 :root {
   --color-white: #ece9e9;
-  --color-black: #2A2A2C;
+  --color-black: #1b1b1b;
   --color-fg: var(--color-white);
-  --color-bg: #312b5c;
+  --color-bg: #000000;
   --color-bg-control: #3d366d;
   --color-fg-control-dis: #8c81d3;
   --color-fg-control-focus: #8c81d33d;
-  --color-bg-grad-start: #27224da4;
-  --color-bg-grad-end: #3d366da4;
+  --color-bg-grad-start: #282828;
+  --color-bg-grad-end: #181818;
   --color-trans: #00000000;
+  --color-neutral-light: #ffffff23;
   --color-link: #185ae7;
   --color-warning: #c43410;
 }
@@ -37,7 +38,6 @@ body {
   overflow: hidden;
   font-family: Menlo;
   font-weight: 400;
-  /* user-select: none; */
   margin: 0;
   background-color: transparent;
   color: var(--color-fg);
@@ -45,41 +45,54 @@ body {
 }
 
 .main-container {
-  display: grid;
-  grid-template-rows: 30px 1fr;
   height: 100vh;
 }
 
 .header-container {
-  grid-row: 1;
+  position: absolute;
+  height: 30px;
+  top: 0px;
+  left: 0px;
+  width: 100%;
   -webkit-app-region: drag;
 }
 
 .focus-container {
-  grid-row: 2;
   display: grid;
   grid-template-columns: 300px 1fr;
-  grid-template-rows: 1fr 1fr;
-  height: calc(100vh - 30px);
+  grid-template-rows: 30px 1fr 1fr;
+  height: 100vh;
+  background: linear-gradient(56deg, var(--color-bg-grad-start) 0%, var(--color-bg-grad-end));
+}
+
+.doc-list-header {
+  grid-column: 1;
+  grid-row: 1;
+  background-color: var(--color-bg);
 }
 
 .doc-list {
   grid-column: 1;
-  grid-row-start: 1;
-  grid-row-end: 3;
+  grid-row-start: 2;
+  grid-row-end: 4;
+  background-color: var(--color-bg);
   overflow-y: auto;
 }
 
 .parsed-text {
   padding: 3px;
   grid-column: 2;
-  grid-row: 2;
+  grid-row: 3;
   overflow-y: auto;
+  margin: 3px;
 }
 
 .doc-stats {
+  display: grid;
   grid-column: 2;
-  grid-row: 1;
+  grid-row: 2;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: max-content;
 }
 
 .drop-item {
@@ -91,6 +104,23 @@ body {
 }
 
 .stat-item {
-  margin: 3px;
+  grid-column: 1;
+  margin: auto 3px;
   cursor: pointer;
+  text-align: right;
+}
+
+.stat-bar {
+  grid-column: 2;
+  margin: auto 3px;
+  cursor: pointer;
+  border: 1px green solid;
+  border-radius: 2px;
+  width: 20px;
+}
+
+.doc-focus {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  margin: 3px;
 }
