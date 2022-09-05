@@ -3,7 +3,7 @@ const $ = require('jquery')
 const { exec } = require('child_process')
 
 let docList = []
-let wordList = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kubernetes', 'Docker', 'React', 'AWS ', 'Amazon', 'GCP', 'Azure', 'DevOps', 'CDN']
+let wordList = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kubernetes', 'Docker', 'React', 'AWS', 'Amazon', 'GCP', 'Azure', 'DevOps', 'CDN']
 
 $('body').on('dragover', false).on('drop', function(e) {
   e.preventDefault()

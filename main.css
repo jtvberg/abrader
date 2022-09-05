@@ -8,7 +8,7 @@
   --color-fg-control-focus: #8c81d33d;
   --color-bg-grad-start: #282828;
   --color-bg-grad-end: #181818;
-  --color-bar: green;
+  --color-bar: #24b024;
   --color-trans: #00000000;
   --color-neutral-light: #ffffff23;
   --color-link: #185ae7;
@@ -61,7 +61,7 @@ body {
 .focus-container {
   display: grid;
   grid-template-columns: 300px 1fr;
-  grid-template-rows: 30px 1fr 1fr 10px;
+  grid-template-rows: 30px auto 1fr 10px;
   height: 100vh;
   background: linear-gradient(56deg, var(--color-bg-grad-start) 0%, var(--color-bg-grad-end));
 }
@@ -95,6 +95,7 @@ body {
   grid-row: 2;
   grid-template-columns: auto 1fr;
   grid-template-rows: max-content;
+  gap: 3px;
 }
 
 .drop-item {
@@ -116,10 +117,13 @@ body {
   grid-column: 2;
   margin: auto 3px;
   cursor: pointer;
-  border: 1px green solid;
-  background-color: green;
+  border: 1px var(--color-bar) solid;
+  background-color: var(--color-bar);
   border-radius: 2px;
-  width: 20px;
+  width: 10px;
+  height: 30px;
+  line-height: 30px;
+  padding-right: 2px;
 }
 
 .doc-focus {
