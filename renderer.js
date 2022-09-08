@@ -13,6 +13,12 @@ $('body').on('dragover', false).on('drop', function(e) {
         const file = item.getAsFile()
         if (docList.some(i => i.doc === file.name)) { return }
         $('#drop-file').append(`<div class="drop-item">${file.name}</div>`)
+        if (file.type === 'application/msword') {
+          file.text().then(result => {
+            addDoc(file.name, result.replace(/[^ \w+]/gi, ''))
+          })
+          return
+        }
         if (file.type === 'application/pdf') {
           ipcRenderer.send('parse-pdf', { path: file.path, name: file.name })
           return
@@ -23,8 +29,8 @@ $('body').on('dragover', false).on('drop', function(e) {
             return
           }
           if (stderr) {
-              console.log(`stderr: ${stderr}`)
-              return
+            console.log(`stderr: ${stderr}`)
+            return
           }
           addDoc(file.name, stdout)
         })
