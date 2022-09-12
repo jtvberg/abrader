@@ -5,10 +5,10 @@ const { exec } = require('child_process')
 let docList = []
 let wordList = ['CI/CD', 'CD ', 'Jenkins', 'API', 'Container', 'Kubernetes', 'Docker', 'React', 'AWS', 'Amazon', 'GCP', 'Azure', 'DevOps', 'CDN']
 
-$('body').on('dragover', false).on('drop', function(e) {
+$('body').on('dragover', false).on('drop', (e) => {
   e.preventDefault()
   if (e.originalEvent.dataTransfer.items) {
-    [...e.originalEvent.dataTransfer.items].forEach((item, i) => {
+    [...e.originalEvent.dataTransfer.items].forEach((item) => {
       if (item.kind === 'file') {
         const file = item.getAsFile()
         if (docList.some(i => i.doc === file.name)) { return }
@@ -50,9 +50,7 @@ ipcRenderer.on('json-pdf', (e, data) => {
  * @param {string} text Raw text to store
  */
 const addDoc = (name, text) => {
-  $('.parsed-text').empty()
-  $('.parsed-text').append(`<div>${text}</div>`)
-  $('.parsed-text').html(`<div>${$('.parsed-text').text()}</div>`)
+  $('.parsed-text').empty().append(`<div>${text}</div>`)
   docList.push(
     {
       doc: name,
@@ -60,7 +58,7 @@ const addDoc = (name, text) => {
       rawText: $('.parsed-text').text()
     }
   )
-  displayStats(docList.find(i => i.doc === name))
+  displayStats(name)
 }
 
 /**
@@ -93,9 +91,10 @@ const countWord = (text, word) => {
 
 /**
  * Function that displays the stats of a selected document
- * @param {string} entry Item from Document List (docList) to look up and display
+ * @param {string} name Document name from Document List (docList) to look up and display
  */
-const displayStats = (entry) => {
+const displayStats = (name) => {
+  const entry = docList.find(i => i.doc === name)
   $('.doc-stats, .parsed-text').empty()
   $('.doc-stats').append(`<div class="doc-focus">${entry.doc}</div>`)
   $.each(entry.wordCount, (i, word) => {
@@ -103,6 +102,7 @@ const displayStats = (entry) => {
     $('.doc-stats').append(`<div class="stat-bar" style="width: ${word.count * 10}px" data-term="${word.word}">${word.count}</div>`)
   })
   $('.parsed-text').html(`<div>${entry.rawText}</div>`)
+  $('.parsed-text').scrollTop(0)
 }
 
 /**
@@ -117,8 +117,7 @@ const highlightTerm = (term) => {
 
 // Display doc stats on doc list item click
 $(document).on('click', '.drop-item', function () {
-  displayStats(docList.find(i => i.doc === $(this).text()))
-  $('.parsed-text').scrollTop(0)
+  displayStats($(this).text())
 })
 
 // Highlight term in raw text on stat word click
