@@ -19,11 +19,13 @@ $('body').on('dragover', false).on('drop', (e) => {
           })
           return
         }
+        const path = `/Users/userName/Downloads/${file.name}` // temp fix userName
         if (file.type === 'application/pdf') {
-          ipcRenderer.send('parse-pdf', { path: file.path, name: file.name })
+          ipcRenderer.send('parse-pdf', { path: path, name: file.name })
           return
         }
-        exec(`unzip -p "${file.path}" word/document.xml`, (error, stdout, stderr) => {
+
+        exec(`unzip -p ${path} word/document.xml`, (error, stdout, stderr) => {
           if (error) {
             console.log(`error: ${error.message}`)
             return
